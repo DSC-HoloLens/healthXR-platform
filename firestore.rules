@@ -1,0 +1,48 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 🔹 Helper Functions
+    function isSuperAdmin() {
+      return request.auth != null && request.auth.token.role == "superadmin";
+    }
+
+    function isOfficeAdmin(officeId) {
+      return request.auth != null &&
+             request.auth.token.role == "officeadmin" &&
+             request.auth.token.officeId == officeId;
+    }
+
+    // 🔹 Users Collection: Super Admins can access all users; users can read/write their own data
+    match /users/{userId} {
+      allow read, write: if isSuperAdmin() || request.auth.uid == userId;
+    }
+
+    // 🔹 Offices Collection: Super Admins & Office Admins (for their own office)
+    match /offices/{officeId} {
+      allow read, write: if isSuperAdmin() || isOfficeAdmin(officeId);
+    }
+
+    // 🔹 Office Videos: Only Super Admins & Office Admins (for their office)
+    match /offices/{officeId}/videos/{videoId} {
+      allow read, write: if isSuperAdmin() || isOfficeAdmin(officeId);
+    }
+
+    // 🔹 Logs Collection: Only Super Admins can see logs
+    match /logs/{logId} {
+      allow read, write: if isSuperAdmin();
+    }
+
+    // 🔹 Videos Collection: Restrict access & decryption
+    match /videos/{videoId} {
+      // Super Admins can read (decrypt) all videos,
+      // and Office Admins can read videos for their assigned office.
+      // Regular Users cannot read (decrypt) any videos.
+      allow read: if isSuperAdmin() || (resource.data.officeId != null && isOfficeAdmin(resource.data.officeId));
+      
+      // Any authenticated user can upload videos, but ensure officeId is provided.
+      allow write: if request.auth != null && request.resource.data.officeId != null;
+    }
+  }
+}

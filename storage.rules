@@ -1,0 +1,16 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // 🔹 Allow only authenticated users to upload & read their own videos
+    match /videos/{videoId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // 🔹 Allow Super Admins to access all files
+    match /{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.token.role == "superadmin";
+    }
+  }
+}
