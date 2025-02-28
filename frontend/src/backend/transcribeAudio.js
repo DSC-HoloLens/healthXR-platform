@@ -7,7 +7,7 @@ const audioFilePath = 'audio.mp3';
 
 console.log('Extracting audio from video...');
 const ffmpeg = require('fluent-ffmpeg');
-ffmpeg('data/bison.mp4')
+ffmpeg('data/4secVid.mp4')
     .output(audioFilePath)
     .noVideo()
     .on('end', () => {
