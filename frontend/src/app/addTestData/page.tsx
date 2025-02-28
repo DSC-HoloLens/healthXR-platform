@@ -1,7 +1,7 @@
 "use client";
 
 import { db } from "@/firebase/firebaseConfig";
-import { collection, doc, setDoc } from "firebase/firestore";
+import { collection, doc, setDoc } from '@firebase/firestore/lite';
 
 export default function AddTestData() {
   const addTestData = async () => {

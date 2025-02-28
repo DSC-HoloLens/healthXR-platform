@@ -1,3 +1,9 @@
+// Consistently set the emulator hosts for Firestore and Storage if needed
+process.env.FIRESTORE_EMULATOR_HOST = "localhost:8080";
+process.env.STORAGE_EMULATOR_HOST = "localhost:9199";
+
+// The existing code remains unchanged
+
 const admin = require("firebase-admin");
 
 // 🔹 Manually set the Firebase project ID (same as your emulator project)
